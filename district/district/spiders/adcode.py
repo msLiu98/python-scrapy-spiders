@@ -4,6 +4,8 @@ from ..items import *
 from scrapy.loader import ItemLoader
 from urllib.parse import urljoin
 from scrapy.loader.processors import MapCompose
+import os
+import time
 
 
 class DistrictSpider(scrapy.Spider):
@@ -24,13 +26,15 @@ class DistrictSpider(scrapy.Spider):
     api2019 = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2019/'  # 2019年数据
     # TODO http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2011/ 2011年的数据
 
-    fileProv = r'..\data\province.csv'
-    fileCity = r'..\data\city.csv'
-    fileCnty = r'..\data\county.csv'
-    fileTown = r'..\data\town.csv'
-    fileVlge = r'..\data\village.csv'
+    fileProv = r'data\province.csv'
+    fileCity = r'data\city.csv'
+    fileCnty = r'data\county.csv'
+    fileTown = r'data\town.csv'
+    fileVlge = r'data\village.csv'
 
     def start_requests(self):
+        # print(os.getcwd())  # 'D:\Projects_Github\Public_Projects\python-scrapy-spiders\district'
+        # time.sleep(5)
         yield scrapy.Request(url=self.api2019, headers=self.headers, callback=self.get_prov)
 
     def get_prov(self, response):
@@ -54,7 +58,7 @@ class DistrictSpider(scrapy.Spider):
 
     def get_cnty(self, response):  # 6位地区代码
         apiCnty = response.url[:response.url.rfind('/') + 1]
-        ld_cnty = ItemLoader(item=CityItem(), response=response)
+        ld_cnty = ItemLoader(item=CntyItem(), response=response)
         ld_cnty.add_xpath('cnty_name', '//tr[@class="countytr"]/td[2]/a/text()')
         ld_cnty.add_xpath('cnty_code', '//tr[@class="countytr"]/td[1]/a/text()')
         ld_cnty.add_xpath('cnty_url', '//tr[@class="countytr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiCnty, i)))
@@ -65,7 +69,7 @@ class DistrictSpider(scrapy.Spider):
 
     def get_town(self, response):  # 9位地区代码
         apiTown = response.url[:response.url.rfind('/') + 1]
-        ld_town = ItemLoader(item=CityItem(), response=response)
+        ld_town = ItemLoader(item=TownItem(), response=response)
         ld_town.add_xpath('town_name', '//tr[@class="towntr"]/td[2]/a/text()')
         ld_town.add_xpath('town_code', '//tr[@class="towntr"]/td[1]/a/text()')
         ld_town.add_xpath('town_url', '//tr[@class="towntr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiTown, i)))
