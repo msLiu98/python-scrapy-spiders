@@ -7,8 +7,7 @@ from scrapy.loader.processors import MapCompose
 
 
 class DistrictSpider(scrapy.Spider):
-    name = 'district_name'
-    allowed_domains = ['gov.cn']
+    name = 'adcode'
     headers = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
         "Accept-Encoding": "gzip, deflate",
@@ -21,10 +20,15 @@ class DistrictSpider(scrapy.Spider):
         "Upgrade-Insecure-Requests": "1",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36",
     }
-    # ua = UserAgent()
     api2018 = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2018/'
     api2019 = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2019/'  # 2019年数据
     # TODO http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2011/ 2011年的数据
+
+    fileProv = r'..\data\province.csv'
+    fileCity = r'..\data\city.csv'
+    fileCnty = r'..\data\county.csv'
+    fileTown = r'..\data\town.csv'
+    fileVlge = r'..\data\village.csv'
 
     def start_requests(self):
         yield scrapy.Request(url=self.api2019, headers=self.headers, callback=self.get_prov)
@@ -44,7 +48,7 @@ class DistrictSpider(scrapy.Spider):
         ld_city.add_xpath('city_code', '//tr[@class="citytr"]/td[1]/a/text()')
         ld_city.add_xpath('city_url', '//tr[@class="citytr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(self.api2019, i)))
         item_city = ld_city.load_item()
-        yield ld_city
+        yield item_city
         for url in item_city['city_url']:
             yield scrapy.Request(url=url, headers=self.headers, callback=self.get_cnty)
 
@@ -55,7 +59,7 @@ class DistrictSpider(scrapy.Spider):
         ld_cnty.add_xpath('cnty_code', '//tr[@class="countytr"]/td[1]/a/text()')
         ld_cnty.add_xpath('cnty_url', '//tr[@class="countytr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiCnty, i)))
         item_cnty = ld_cnty.load_item()
-        yield ld_cnty
+        yield item_cnty
         for url in item_cnty['cnty_url']:
             yield scrapy.Request(url=url, headers=self.headers, callback=self.get_town)
 
@@ -66,6 +70,6 @@ class DistrictSpider(scrapy.Spider):
         ld_town.add_xpath('town_code', '//tr[@class="towntr"]/td[1]/a/text()')
         ld_town.add_xpath('town_url', '//tr[@class="towntr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiTown, i)))
         item_town = ld_town.load_item()
-        yield ld_town
-        for url in item_town['cnty_url']:
-            yield scrapy.Request(url=url, headers=self.headers, callback=self.get_town)
+        yield item_town
+        # for url in item_town['cnty_url']:
+        #     yield scrapy.Request(url=url, headers=self.headers, callback=self.get_town)

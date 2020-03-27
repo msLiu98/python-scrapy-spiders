@@ -37,24 +37,24 @@ class VillageSpider(scrapy.Spider):
         for url in urls:
             # headers = self.headers.copy()
             # headers['User-Agent'] = ua.random()
-            yield scrapy.Request(url=url, headers=self.headers, callback=self.get_village)
+            yield scrapy.Request(url=url, headers=self.headers, callback=self.get_vlge)
 
-    def get_village(self, response):
+    def get_vlge(self, response):
         url = response.url
-        villages_codes = response.xpath('//tr[@class="villagetr"]/td[1]/text()').extract()
-        village_categories = response.xpath('//tr[@class="villagetr"]/td[2]/text()').extract()
-        villages_names = response.xpath('//tr[@class="villagetr"]/td[3]/text()').extract()
-        # for village, code, village_category in zip(villages_names, villages_codes, village_categories):
-        #     village_item = VillageItem()
-        #     village_item['village'] = village
-        #     village_item['village_code'] = code
-        #     village_item['village_category'] = village_category
-        #     village_item['url'] = url
-        #     yield village_item
-        village_dict = {
-            "village": villages_names,
-            "village_code": villages_codes,
-            "village_category": village_categories,
+        vlges_codes = response.xpath('//tr[@class="villagetr"]/td[1]/text()').extract()
+        vlge_categories = response.xpath('//tr[@class="villagetr"]/td[2]/text()').extract()
+        vlges_names = response.xpath('//tr[@class="villagetr"]/td[3]/text()').extract()
+        # for vlge, code, vlge_category in zip(vlges_names, vlges_codes, vlge_categories):
+        #     vlge_item = VillageItem()
+        #     vlge_item['vlge'] = vlge
+        #     vlge_item['vlge_code'] = code
+        #     vlge_item['vlge_category'] = vlge_category
+        #     vlge_item['url'] = url
+        #     yield vlge_item
+        vlge_dict = {
+            "vlge": vlges_names,
+            "vlge_code": vlges_codes,
+            "vlge_ctgr": vlge_categories,
             "url": url,
         }
-        yield village_dict
+        yield vlge_dict

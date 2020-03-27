@@ -7,7 +7,7 @@
 
 from scrapy import signals
 import base64
-from my_fake_useragent import UserAgent
+from fake_useragent import UserAgent
 
 # 代理服务器
 proxyServer = "http://http-dyn.abuyun.com:9020"

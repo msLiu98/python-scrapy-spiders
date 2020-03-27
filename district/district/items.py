@@ -32,8 +32,8 @@ class TownItem(scrapy.Item):
     town_url = scrapy.Field()
 
 
-class VillageItem(scrapy.Item):
-    village = scrapy.Field()
-    village_code = scrapy.Field()
-    village_category = scrapy.Field()
+class VlgeItem(scrapy.Item):
+    vlge = scrapy.Field()
+    vlge_code = scrapy.Field()
+    vlge_ctgr = scrapy.Field()
     url = scrapy.Field()
