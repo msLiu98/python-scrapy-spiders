@@ -18,9 +18,9 @@ class DistrictPipeline(object):
             if not os.path.exists(fp_to):
                 spider.logger.info('没有文件，新创建！')
                 dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False)
-                spider.logger.warning('***** 省级 区域已录入，无需重复录入 *****')
-            else:
                 spider.logger.info('***** 完成 省级 区域录入 *****')
+            else:
+                spider.logger.warning('***** 省级 区域已录入，无需重复录入 *****')
                 
         elif isinstance(item, CityItem):
             fp_to = spider.fileCity
@@ -28,7 +28,8 @@ class DistrictPipeline(object):
                 spider.logger.info('没有文件，新创建！')
                 dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False)
             else:
-                dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False, header=False)
+                # dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False, header=False)
+                print('pass')
             spider.logger.info('***** 完成 市级 区域录入 *****')
 
         elif isinstance(item, CntyItem):

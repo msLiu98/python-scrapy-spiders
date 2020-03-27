@@ -3,7 +3,7 @@ import scrapy
 from ..items import *
 from scrapy.loader import ItemLoader
 from urllib.parse import urljoin
-from scrapy.loader.processors import MapCompose
+from scrapy.loader.processors import MapCompose, TakeFirst
 import os
 import time
 
@@ -34,7 +34,6 @@ class DistrictSpider(scrapy.Spider):
 
     def start_requests(self):
         # print(os.getcwd())  # 'D:\Projects_Github\Public_Projects\python-scrapy-spiders\district'
-        # time.sleep(5)
         yield scrapy.Request(url=self.api2019, headers=self.headers, callback=self.get_prov)
 
     def get_prov(self, response):
@@ -59,12 +58,13 @@ class DistrictSpider(scrapy.Spider):
     def get_cnty(self, response):  # 6位地区代码
         apiCnty = response.url[:response.url.rfind('/') + 1]
         ld_cnty = ItemLoader(item=CntyItem(), response=response)
-        ld_cnty.add_xpath('cnty_name', '//tr[@class="countytr"]/td[2]/a/text()')
-        ld_cnty.add_xpath('cnty_code', '//tr[@class="countytr"]/td[1]/a/text()')
-        ld_cnty.add_xpath('cnty_url', '//tr[@class="countytr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiCnty, i)))
+        ld_cnty.add_xpath('cnty_name', '//tr[@class="countytr"]/td[2]//text()')  # 这里有些是市辖区，所以要单独处理下
+        ld_cnty.add_xpath('cnty_code', '//tr[@class="countytr"]/td[1]//text()')
+        # ld_cnty.add_xpath('cnty_url', '//tr[@class="countytr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiCnty, i)))
+        next_urls = [urljoin(apiCnty, i) for i in response.xpath('//tr[@class="countytr"]/td[2]/a/@href').extract()]
         item_cnty = ld_cnty.load_item()
         yield item_cnty
-        for url in item_cnty['cnty_url']:
+        for url in next_urls:
             yield scrapy.Request(url=url, headers=self.headers, callback=self.get_town)
 
     def get_town(self, response):  # 9位地区代码
@@ -75,5 +75,13 @@ class DistrictSpider(scrapy.Spider):
         ld_town.add_xpath('town_url', '//tr[@class="towntr"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiTown, i)))
         item_town = ld_town.load_item()
         yield item_town
-        # for url in item_town['cnty_url']:
-        #     yield scrapy.Request(url=url, headers=self.headers, callback=self.get_town)
+        for url in item_town['town_url']:
+            yield scrapy.Request(url=url, headers=self.headers, callback=self.get_vlge)
+
+    def get_vlge(self, response):  # 12位地区代码
+        ld_vlge = ItemLoader(item=VlgeItem(), response=response)
+        ld_vlge.add_xpath('vlge_name', '//tr[@class="villagetr"]/td[3]/text()')
+        ld_vlge.add_xpath('vlge_code', '//tr[@class="villagetr"]/td[1]/text()')
+        ld_vlge.add_xpath('vlge_ctgr', '//tr[@class="villagetr"]/td[2]/text()')
+        item_vlge = ld_vlge.load_item()
+        yield item_vlge

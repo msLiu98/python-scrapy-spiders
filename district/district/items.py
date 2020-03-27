@@ -27,13 +27,12 @@ class CntyItem(scrapy.Item):
 
 
 class TownItem(scrapy.Item):
-    town = scrapy.Field()
+    town_name = scrapy.Field()
     town_code = scrapy.Field()
     town_url = scrapy.Field()
 
 
 class VlgeItem(scrapy.Item):
-    vlge = scrapy.Field()
+    vlge_name = scrapy.Field()
     vlge_code = scrapy.Field()
     vlge_ctgr = scrapy.Field()
-    url = scrapy.Field()
