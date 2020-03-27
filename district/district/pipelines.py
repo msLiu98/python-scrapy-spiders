@@ -58,3 +58,30 @@ class DistrictPipeline(object):
             else:
                 dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False, header=False)
             spider.logger.info('***** 完成 居委会/村级 区域录入 *****')
+
+
+class AdcodePipeline(object):
+    def process_item(self, item, spider):
+        if isinstance(item, DataItem):
+            dfTmp = pd.DataFrame(dict(item))
+            fp_to = spider.fileData
+            if not os.path.exists(fp_to):
+                spider.logger.info('没有文件，新创建！')
+                dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False)
+            else:
+                dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False, header=False)
+            spider.logger.info('***** 完成 数据 录入 *****')
+        
+        elif isinstance(item, UrlItem):
+            urlDict = {
+                'from_url': item['from_url'][0],
+                'next_url': item['next_url']
+            }
+            dfTmp = pd.DataFrame(urlDict)
+            fp_to = spider.fileUrl
+            if not os.path.exists(fp_to):
+                spider.logger.info('没有文件，新创建！')
+                dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False)
+            else:
+                dfTmp.to_csv(fp_to, mode='a+', encoding='utf-8-sig', index=False, header=False)
+            spider.logger.info('***** 完成 网址 录入 *****')

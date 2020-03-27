@@ -36,3 +36,13 @@ class VlgeItem(scrapy.Item):
     vlge_name = scrapy.Field()
     vlge_code = scrapy.Field()
     vlge_ctgr = scrapy.Field()
+
+
+class DataItem(scrapy.Item):
+    ad_name = scrapy.Field()
+    ad_code = scrapy.Field()
+    
+    
+class UrlItem(scrapy.Item):
+    from_url = scrapy.Field()
+    next_url = scrapy.Field()

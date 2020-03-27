@@ -19,7 +19,7 @@ COOKIES_ENABLED = True
 LOG_LEVEL = 'INFO'
 
 # 爬取等级设置，1-广度优先，先进先出，FIFO；0-深度优先，后进先出，LIFO
-DEPTH_PRIORITY = 0
+DEPTH_PRIORITY = 1
 CONCURRENT_REQUESTS = 4
 DOWNLOAD_DELAY = 0.3
 # CONCURRENT_REQUESTS_PER_IP = 4
@@ -28,7 +28,8 @@ DOWNLOADER_MIDDLEWARES = {
    'district.middlewares.DistrictDownloaderMiddleware': 543,
 }
 ITEM_PIPELINES = {
-   'district.pipelines.DistrictPipeline': 300,
+   # 'district.pipelines.DistrictPipeline': 300,
+   'district.pipelines.AdcodePipeline': 300,
 }
 
 # Disable Telnet Console (enabled by default)

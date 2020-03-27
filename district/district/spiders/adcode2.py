@@ -28,21 +28,47 @@ class Adcode2Spider(scrapy.Spider):
 
     encoding = 'utf-8-sig'
     fileData = r'data\all_data.csv'
+    fileUrl = r'data\all_urls.csv'
+    levelDict = {
+        0: 'provincetr',
+        7: 'citytr',
+        9: 'countytr',
+        11: 'towntr',
+        14: 'villagetr',
+    }
     
     def start_requests(self):
         leftUrls = self.load_urls()
+        self.logger.info(f'---- 此次运行总任务 {len(leftUrls)} ----')
         for url in leftUrls:
             yield scrapy.Request(url=url, headers=self.headers)
     
     def parse(self, response):
-        pass
+        from_url = response.url
+        level = len(from_url.split('/')[-1])
+        tr = self.levelDict[level]
+        ld_data = ItemLoader(item=DataItem(), response=response)
+        apiNext = from_url[:from_url.rfind('/') + 1]
+        ld_url = ItemLoader(item=UrlItem(), response=response)
+        if level == 0:
+            ld_data.add_xpath('ad_name', '//tr[@class="provincetr"]/td//text()')  # 这里有些是市辖区，所以要 // 处理
+            ld_data.add_xpath('ad_code', '//tr[@class="provincetr"]/td//text()')
+            ld_url.add_value('from_url', from_url)
+            ld_url.add_xpath('next_url', '//tr[@class="provincetr"]/td/a/@href', MapCompose(lambda i: urljoin(apiNext, i)))
+        else:
+            ld_data.add_xpath('ad_name', f'//tr[@class="{tr}"]/td[2]//text()')  # 这里有些是市辖区，所以要 // 处理
+            ld_data.add_xpath('ad_code', f'//tr[@class="{tr}"]/td[1]//text()')
+            ld_url.add_value('from_url', from_url)
+            ld_url.add_xpath('next_url', f'//tr[@class="{tr}"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiNext, i)))
+        yield ld_data.load_item()
+        yield ld_url.load_item()
 
     def load_urls(self):
-        to_crawl_urls = set()
+        to_crawl_urls = {self.api2019}
         crawled_urls = set()
-        if os.path.exists(self.fileData):
-            df_tmp = pd.read_csv(self.fileData, encoding=self.encoding)['from_url']
+        if os.path.exists(self.fileUrl):
+            df_tmp = pd.read_csv(self.fileUrl, encoding=self.encoding)
             crawled_urls = set(df_tmp['from_url'])
-            to_crawl_urls = set(df_tmp['next_url'])
-        left_urls = to_crawl_urls - crawled_urls
-        return left_urls
+            to_crawl_urls.update(set(df_tmp['next_url']))
+        to_crawl_urls -= crawled_urls
+        return to_crawl_urls
