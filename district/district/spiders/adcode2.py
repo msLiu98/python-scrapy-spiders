@@ -41,7 +41,8 @@ class Adcode2Spider(scrapy.Spider):
         leftUrls = self.load_urls()
         self.logger.info(f'---- 此次运行总任务 {len(leftUrls)} ----')
         for url in leftUrls:
-            yield scrapy.Request(url=url, headers=self.headers)
+            if url:
+                yield scrapy.Request(url=url, headers=self.headers)
     
     def parse(self, response):
         from_url = response.url
@@ -55,6 +56,11 @@ class Adcode2Spider(scrapy.Spider):
             ld_data.add_xpath('ad_code', '//tr[@class="provincetr"]/td//text()')
             ld_url.add_value('from_url', from_url)
             ld_url.add_xpath('next_url', '//tr[@class="provincetr"]/td/a/@href', MapCompose(lambda i: urljoin(apiNext, i)))
+        elif level == 14:
+            ld_data.add_xpath('ad_name', f'//tr[@class="{tr}"]/td[3]//text()')  # 这里有些是市辖区，所以要 // 处理
+            ld_data.add_xpath('ad_code', f'//tr[@class="{tr}"]/td[1]//text()')
+            ld_url.add_value('from_url', from_url)
+            ld_url.add_xpath('next_url', f'//tr[@class="{tr}"]/td[2]/a/@href', MapCompose(lambda i: urljoin(apiNext, i)))
         else:
             ld_data.add_xpath('ad_name', f'//tr[@class="{tr}"]/td[2]//text()')  # 这里有些是市辖区，所以要 // 处理
             ld_data.add_xpath('ad_code', f'//tr[@class="{tr}"]/td[1]//text()')
@@ -67,7 +73,7 @@ class Adcode2Spider(scrapy.Spider):
         to_crawl_urls = {self.api2019}
         crawled_urls = set()
         if os.path.exists(self.fileUrl):
-            df_tmp = pd.read_csv(self.fileUrl, encoding=self.encoding)
+            df_tmp = pd.read_csv(self.fileUrl, encoding=self.encoding).fillna('')
             crawled_urls = set(df_tmp['from_url'])
             to_crawl_urls.update(set(df_tmp['next_url']))
         to_crawl_urls -= crawled_urls
