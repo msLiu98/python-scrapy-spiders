@@ -16,11 +16,11 @@ class CtnPipeline(object):
     def process_item(self, item, spider):
         assert isinstance(item, CtnItem)
         spider.logger.info('成功获得数据! {}'.format(item['chp_title'][0]))
-        dir_path = r'D:\Projects_Github\Projects_Scrapy\novel\_csvFiles\chp_content'
-        if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
-        f_p = os.path.join(dir_path, item['file_name'][0])
-        with open(f_p, 'w', encoding='utf-8-sig') as f_tmp:
+        fileName = item['file_name'][0]
+        fp_to = f'{spider.dataDir}\\{fileName}'
+        if not os.path.exists(spider.dataDir):
+            os.mkdir(spider.dataDir)
+        with open(fp_to, 'w', encoding='utf-8-sig') as f_tmp:
             f_tmp.write(item['chp_title'][0])
             f_tmp.write('\n')
             f_tmp.write('\n'.join(item['chp_ctn']).replace('&nbsp;', ''))

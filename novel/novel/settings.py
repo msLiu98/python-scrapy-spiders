@@ -14,6 +14,12 @@ BOT_NAME = 'novel'
 SPIDER_MODULES = ['novel.spiders']
 NEWSPIDER_MODULE = 'novel.spiders'
 
+LOG_LEVEL = 'INFO'
+ROBOTSTXT_OBEY = False
+COOKIES_ENABLED = False
+DOWNLOAD_TIMEOUT = 60
+CONCURRENT_REQUESTS = 4
+
 DOWNLOADER_MIDDLEWARES = {
    # 'novel.middlewares.ProxySelfDownloaderMiddleware': 543,
    'novel.middlewares.UserAgentDownloaderMiddleware': 540,
@@ -23,19 +29,11 @@ IMAGES_STORE = 'nines'
 IMAGES_EXPIRES = 90
 ITEM_PIPELINES = {
    # 'novel.pipelines.ChpPipeline': 300,
-   # 'novel.pipelines.CtnPipeline': 300,
-   'novel.pipelines.NovelImagePipeline': 800,
-   'novel.pipelines.NovelCsvPipeline': 300,
+   'novel.pipelines.CtnPipeline': 300,
+   # 'novel.pipelines.NovelImagePipeline': 800,
+   # 'novel.pipelines.NovelCsvPipeline': 300,
 }
 
-LOG_LEVEL = 'INFO'
-ROBOTSTXT_OBEY = False
-COOKIES_ENABLED = False
-DOWNLOAD_TIMEOUT = 60
-
-# DOWNLOAD_DELAY = 05
-CONCURRENT_REQUESTS = 3
-# CONCURRENT_REQUESTS_PER_IP = 4
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
