@@ -28,63 +28,34 @@ class YzspiderSpider(scrapy.Spider):
         "Upgrade-Insecure-Requests": "1",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
     }
-    cookies = {
-        'Hm_lpvt_65968db3ac154c3089d7f9a4cbb98c94': '1584800730',
-        'Hm_lvt_65968db3ac154c3089d7f9a4cbb98c94': '1584800524',
-        'PHPSESSID': 'g5dbm46h2s8ko7mp1ieqdorno6',
-        'UtzD_f52b_creditbase': '0D0D0D0D0D0D0D0D0',
-        'UtzD_f52b_creditnotice': '0D0D2D0D0D0D0D0D0D761419',
-        'UtzD_f52b_creditrule': '%E6%AF%8F%E5%A4%A9%E7%99%BB%E5%BD%95',
-        'UtzD_f52b_lastact': '1584838116%09uc.php%09',
-        'UtzD_f52b_lastvisit': '1584798431',
-        'UtzD_f52b_saltkey': 'Qi20Ksz2',
-        'UtzD_f52b_ulastactivity': '1584800714%7C0',
-        '_ga': 'GA1.3.1642981795.1584800738',
-        '_gat': '1',
-        '_gid': 'GA1.3.880137863.1584800738',
-        'acw_tc': '707c9f9915848006694621700e316b294a1d86864ea43ada7df91db84ab4d8',
-        'his': 'a%3A10%3A%7Bi%3A0%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRwapmT%22%3Bi%3A1%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRwapmb%22%3Bi%3A2%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRwapqb%22%3Bi%3A3%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRwapya%22%3Bi%3A4%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRxYZOT%22%3Bi%3A5%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRxYZWY%22%3Bi%3A6%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRxYpaW%22%3Bi%3A7%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRxYpaZ%22%3Bi%3A8%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRxYpiZ%22%3Bi%3A9%3Bs%3A28%3A%22nJail6zJp6iXaJqWl3FmaGRxYpqX%22%3B%7D',
-        'hmap_show': 'true',
-        'kztoken': 'nJail6zJp6iXaJqWl3FmaGRxYpqX',
-        'think_language': 'zh-CN',
-        'yaozh_mylogin': '1584838115',
-        'yaozh_uidhas': '1',
-        'yaozh_userId': '896097'
-    }
     pgSize = '30'
-    fileTask = r'D:\Projects_Github\Projects_Scrapy\yaozh\_utils\task_grd_bed_page.csv'
-    fileData = r'D:\Projects_Github\Projects_Scrapy\yaozh\data\hosp_data_grd_bed.csv'
+    fileTask = r'_utils\task_grd_bed_page.csv'
+    fileData = r'data\hosp_data_grd_bed.csv'
     encoding = 'utf-8-sig'
     
     def start_requests(self):
+        bdstr = '1'
+        grd = '全部'
+        tp = '全部'
+        addr = ''
+        prvc = '北京市'
+        pg = '1'
+        
         tasks = self.load_tasks()
         self.logger.info(f'总共有 {len(tasks)} 页数据待爬取')
         for task in tasks:
             # 三级甲等_综合医院_内蒙古自治区_1
             grd, tp, prvc, pg = task.split('_')
             params = {
-                'bedstr': '1',
+                'bedstr': bdstr,
                 'bedend': '',
                 'grade': grd,
                 'type': tp,
-                'address': '',
+                'address': addr,
                 'province': prvc,
                 'p': pg,
                 'pageSize': self.pgSize
             }
-            
-            # 吉林省_长岭_1
-            # prvc, adr, pg = task.split('_')
-            # params = {
-            #     'grade': '全部',
-            #     'type': '全部',
-            #     'address': adr,
-            #     'province': prvc,
-            #     'p': pg,
-            #     'pageSize': self.pgSize
-            # }
-            
-            # self.logger.info(f'爬取第 {pg} 页 待爬取')
             meta = {
                 'tid': task,
                 'pid': '_'.join(params.values())
